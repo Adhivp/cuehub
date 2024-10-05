@@ -2,6 +2,7 @@ import os
 import json
 import click
 import subprocess
+import shutil
 
 CONFIG_FILE = '.cuehubconfig'
 
@@ -51,3 +52,18 @@ def copy_template(template_path, destination):
         click.echo(f'Template files copied from {template_path} to {destination}.')
     else:
         click.echo(f'Template path {template_path} does not exist. Unable to copy template files.')
+
+def read_project_name():
+    """Read the project name from the config file."""
+    if check_existing_user():
+        user_data = load_user_details()
+        project_name = user_data.get('project_name')
+        if project_name:
+            click.echo(f'Project name: {project_name}')
+            return project_name
+        else:
+            click.echo('Project name not found in the config file.')
+            return None
+    else:
+        click.echo('Config file does not exist. Please run "cue init" first.')
+        return None

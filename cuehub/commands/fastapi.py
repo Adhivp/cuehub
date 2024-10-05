@@ -1,10 +1,14 @@
 import os
 import click
-from cuehub.utils.framework_helper import check_and_create_virtualenv, install_package, copy_template
+from cuehub.utils.framework_helper import check_and_create_virtualenv, install_package, copy_template,read_project_name
 
 def setup_fastapi():
     """Sets up a FastAPI project."""
-    project_name = click.prompt('Enter your FastAPI project name', type=str)
+    project_name = read_project_name()  # Read project name from config
+
+    if project_name is None:
+        click.echo('Unable to set up FastAPI project. Please run "cue init" to initialize first.')
+        return
 
     # Check and create virtual environment
     venv_name = f"{project_name}_venv"

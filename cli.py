@@ -1,6 +1,6 @@
 import os
 import click
-from cuehub.commands import django, flask
+from cuehub.commands import django,flask,fastapi,pyramid, tornado
 from cuehub.utils.framework_helper import save_user_details, check_existing_user
 
 @click.group()
@@ -35,3 +35,18 @@ def setup_django():
 def setup_flask():
     """Sets up a Flask project."""
     flask.setup_flask()
+
+@cue.command()
+def setup_fastapi():
+    """Sets up a FastAPI project."""
+    fastapi.setup_fastapi()
+
+@cue.command()
+def setup_pyramid():
+    """Sets up a Pyramid project."""
+    pyramid.setup_pyramid()
+
+@cue.command()
+def setup_tornado():
+    """Sets up a Tornado project."""
+    tornado.setup_tornado()

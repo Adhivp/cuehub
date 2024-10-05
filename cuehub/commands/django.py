@@ -1,11 +1,15 @@
 import click
-from cuehub.utils.framework_helper import check_and_create_virtualenv, install_package
+from cuehub.utils.framework_helper import check_and_create_virtualenv, install_package,read_project_name
 import subprocess
 
 
 def setup_django():
     """Sets up a Django project."""
-    project_name = click.prompt('Enter your Django project name', type=str)
+    project_name = read_project_name() 
+
+    if project_name is None:
+        click.echo('Unable to set up Django project. Please run "cue init" to initialize first.')
+        return 
 
     # Check and create virtual environment based on project name
     venv_name = f"{project_name}_venv"

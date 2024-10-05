@@ -4,7 +4,11 @@ from cuehub.utils.framework_helper import check_and_create_virtualenv, install_p
 
 def setup_tornado():
     """Sets up a Tornado project."""
-    project_name = click.prompt('Enter your Tornado project name', type=str)
+    project_name = read_project_name()  # Read project name from config
+
+    if project_name is None:
+        click.echo('Unable to set up Tornado project. Please run "cue init" to initialize first.')
+        return 
 
     # Check and create virtual environment
     venv_name = f"{project_name}_venv"
