@@ -1,6 +1,6 @@
 import os
 import click
-from cuehub.utils.framework_helper import check_and_create_virtualenv, install_package, copy_template
+from cuehub.utils.framework_helper import check_and_create_virtualenv, install_package, copy_template,read_project_name
 
 def setup_tornado():
     """Sets up a Tornado project."""
