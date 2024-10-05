@@ -43,3 +43,11 @@ def install_package(package_name, venv_name):
     click.echo(f'Installing {package_name}...')
     subprocess.run([f'{venv_name}/bin/pip', 'install', package_name])
     click.echo(f'{package_name} installed successfully!')
+
+def copy_template(template_path, destination):
+    """Copy template files from the template path to the destination."""
+    if os.path.exists(template_path):
+        shutil.copytree(template_path, destination, dirs_exist_ok=True)
+        click.echo(f'Template files copied from {template_path} to {destination}.')
+    else:
+        click.echo(f'Template path {template_path} does not exist. Unable to copy template files.')
