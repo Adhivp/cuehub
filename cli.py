@@ -1,12 +1,27 @@
 import os
 import click
+import pyfiglet
+from colorama import init, Fore
 from cuehub.commands import django, flask, fastapi, pyramid, tornado
 from cuehub.utils.framework_helper import save_user_details, check_existing_user
 
 @click.group()
 def cue():
     """CueHub CLI - Setup frameworks like Django, Flask, etc."""
-    pass
+    # Create ASCII art
+    ascii_art = pyfiglet.figlet_format("CueHub")
+
+    # Center the ASCII art
+    width = os.get_terminal_size().columns
+    centered_ascii_art = "\n".join(line.center(width) for line in ascii_art.splitlines())
+
+    # Print ASCII art in green
+    click.echo(Fore.GREEN + centered_ascii_art)
+
+    # Print description centered in green
+    description = "CueHub is a developer tool designed to simplify project workflows and enhance productivity."
+    centered_description = description.center(width)
+    click.echo(Fore.GREEN + centered_description)
 
 @cue.command()
 def init():
