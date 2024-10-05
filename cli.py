@@ -26,27 +26,27 @@ def init():
     else:
         click.echo('CueHub is already initialized with your details.')
 
-@cue.command()
-def setup_django():
+@cue.command(name='setup django')
+def setup_django_cmd():
     """Sets up a Django project."""
     django.setup_django()
 
-@cue.command()
-def setup_flask():
+@cue.command(name='setup flask')
+def setup_flask_cmd():
     """Sets up a Flask project."""
     flask.setup_flask()
 
-@cue.command()
-def setup_fastapi():
+@cue.command(name='setup fastapi')
+def setup_fastapi_cmd():
     """Sets up a FastAPI project."""
     fastapi.setup_fastapi()
 
-@cue.command()
-def setup_pyramid():
+@cue.command(name='setup pyramid')
+def setup_pyramid_cmd():
     """Sets up a Pyramid project."""
     pyramid.setup_pyramid()
 
-@cue.command()
-def setup_tornado():
+@cue.command(name='setup tornado')
+def setup_tornado_cmd():
     """Sets up a Tornado project."""
     tornado.setup_tornado()
