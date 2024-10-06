@@ -14,6 +14,8 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from concurrent.futures import ThreadPoolExecutor
 from functools import wraps
 import random
+from cuehub.commands.git import hard_reset, pull, push, revert
+
 
 
 CONFIG_FILE = '.cuehubconfig'
@@ -294,6 +296,30 @@ def generate_readme(project_dir):
     console.print(markdown)
     recommended_ad = suggest_ads()
     console.print(recommended_ad,style="bold black on yellow")
+
+
+
+    # Adding the Git command helper with full command matching
+@cue.command()
+@click.argument('command', type=str)
+def git_show(command):
+    """Show details of a specific Git command."""
+    
+    # Mapping of valid Git commands to the respective functions
+    command_map = {
+        'pull': pull,
+        'push': push,
+        'revert': revert,
+        'reset': hard_reset
+    }
+    
+    # Ensure the command argument is matched exactly
+    matched_command = command_map.get(command.lower())
+    
+    if matched_command:
+        matched_command()  # Call the corresponding function for the command
+    else:
+        click.echo(f"Error: '{command}' is not a valid Git command. Please use one of: pull, push, revert, reset.")
 
 
 if __name__ == "__main__":
