@@ -10,3 +10,4 @@ ENV/
 venv.bak/
 .idea/
 cuehub.egg-info/
+.env
