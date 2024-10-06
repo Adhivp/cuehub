@@ -5,7 +5,12 @@ from colorama import init, Fore
 from cuehub.commands import django, flask, fastapi, pyramid, tornado 
 from cuehub.commands.analyze_project import GeminiAPI
 from cuehub.utils.framework_helper import save_user_details, check_existing_user,list_project_contents
+import time
+from rich.console import Console
+from rich.markdown import Markdown
+from concurrent.futures import ThreadPoolExecutor
 
+console = Console() 
 @click.group()
 def cue():
     # Create ASCII art
@@ -78,20 +83,35 @@ def setup(framework):
         else:
             click.echo('Invalid choice! Please try again.')
 
-@click.command()
+
+@cue.command()
 @click.argument('project_dir', type=click.Path(exists=True))
 def analyze_project(project_dir):
     """Analyze the project directory and suggest improvements."""
-    contents = list_project_contents(project_dir)  # Assuming this function lists files and directories
-    gemini = GeminiAPI()
-    suggestions = gemini.analyze_project_structure(contents)
+    
+    click.echo("Analyzing project structure, please wait...")
+    def analyze():
+        """Function to perform the analysis."""
+        contents = list_project_contents(project_dir)  # Assuming this function lists files and directories
+        gemini = GeminiAPI()
+        return gemini.analyze_project_structure(contents)
 
-    if suggestions:
-        click.echo("Suggestions for improving your project:")
-        for suggestion in suggestions:
-            click.echo(f"- {suggestion}")
-    else:
-        click.echo("Your project structure looks good!")
+    # Start a thread for the analysis
+    with ThreadPoolExecutor() as executor:
+        future = executor.submit(analyze)
+
+        # Display a loader while processing
+        with click.progressbar(label='Analyzing project structure', length=100) as bar:
+            while not future.done():
+                time.sleep(0.1)  # Sleep briefly to avoid busy-waiting
+                bar.update(1)  # Update the progress bar
+
+        # Get the result of the analysis after it is done
+        suggestions = future.result()
+
+    # Render and print Markdown using rich
+    markdown = Markdown(suggestions)
+    console.print(markdown)
 
 if __name__ == "__main__":
     cue()
