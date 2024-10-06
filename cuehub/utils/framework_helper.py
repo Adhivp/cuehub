@@ -68,11 +68,16 @@ def read_project_name():
         click.echo('Config file does not exist. Please run "cue init" first.')
         return None
     
-def list_project_contents(project_dir):
+def list_project_contents(project_dir, ignore_dirs=None):
     """Return all the directories and files in the specified project directory."""
     project_contents = {}
+    if ignore_dirs is None:
+        ignore_dirs = ['__pycache__', '.git', 'node_modules'] 
 
     for root, dirs, files in os.walk(project_dir):
+        # Modify dirs in place to skip the ignored directories
+        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+
         project_contents[root] = {
             'directories': dirs,
             'files': files
