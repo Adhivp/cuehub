@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-class GeminiAPI:
+class GeminiAPI2:
     def __init__(self):
         self.api_key = os.getenv("GEMINI_API_KEY")
         self.base_url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent"
