@@ -11,6 +11,22 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from concurrent.futures import ThreadPoolExecutor
+from functools import wraps
+
+CONFIG_FILE = '.cuehubconfig'
+
+def check_init():
+    """Check if CueHub has been initialized in the current directory."""
+    return os.path.exists(CONFIG_FILE)
+
+def require_init(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        if not check_init():
+            click.echo("CueHub has not been initialized in this directory. Please run 'cue init' first.")
+            return
+        return f(*args, **kwargs)
+    return wrapped
 
 console = Console() 
 @click.group()
@@ -47,6 +63,7 @@ def init():
         click.echo('CueHub is already initialized with your details.')
 
 @cue.command()
+@require_init
 @click.argument('framework', type=click.Choice(['django', 'flask', 'fastapi', 'pyramid', 'tornado'], case_sensitive=False), required=False)
 def setup(framework):
     """Setup a project with a chosen framework."""
@@ -87,6 +104,7 @@ def setup(framework):
 
 
 @cue.command()
+@require_init
 @click.argument('project_dir', type=click.Path(exists=True))
 def analyze_project(project_dir):
     """Analyze the project directory and suggest improvements."""
@@ -119,6 +137,7 @@ def analyze_project(project_dir):
     console.print(markdown)
 
 @cue.command()
+@require_init
 @click.argument('project_dir', type=click.Path(exists=True))
 def generate_readme(project_dir):
     """Generate a README file for the project."""
