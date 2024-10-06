@@ -67,3 +67,15 @@ def read_project_name():
     else:
         click.echo('Config file does not exist. Please run "cue init" first.')
         return None
+    
+def list_project_contents(project_dir):
+    """Return all the directories and files in the specified project directory."""
+    project_contents = {}
+
+    for root, dirs, files in os.walk(project_dir):
+        project_contents[root] = {
+            'directories': dirs,
+            'files': files
+        }
+
+    return project_contents

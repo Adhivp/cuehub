@@ -2,12 +2,12 @@ import os
 import click
 import pyfiglet
 from colorama import init, Fore
-from cuehub.commands import django, flask, fastapi, pyramid, tornado
-from cuehub.utils.framework_helper import save_user_details, check_existing_user
+from cuehub.commands import django, flask, fastapi, pyramid, tornado 
+from cuehub.commands.analyze_project import GeminiAPI
+from cuehub.utils.framework_helper import save_user_details, check_existing_user,list_project_contents
 
 @click.group()
 def cue():
-    """CueHub CLI - Setup frameworks like Django, Flask, etc."""
     # Create ASCII art
     ascii_art = pyfiglet.figlet_format("CueHub")
 
@@ -77,6 +77,21 @@ def setup(framework):
             tornado.setup_tornado()
         else:
             click.echo('Invalid choice! Please try again.')
+
+@click.command()
+@click.argument('project_dir', type=click.Path(exists=True))
+def analyze_project(project_dir):
+    """Analyze the project directory and suggest improvements."""
+    contents = list_project_contents(project_dir)  # Assuming this function lists files and directories
+    gemini = GeminiAPI()
+    suggestions = gemini.analyze_project_structure(contents)
+
+    if suggestions:
+        click.echo("Suggestions for improving your project:")
+        for suggestion in suggestions:
+            click.echo(f"- {suggestion}")
+    else:
+        click.echo("Your project structure looks good!")
 
 if __name__ == "__main__":
     cue()
