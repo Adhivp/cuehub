@@ -8,6 +8,7 @@ from cuehub.utils.framework_helper import save_user_details, check_existing_user
 import time
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.progress import Progress, SpinnerColumn, TextColumn
 from concurrent.futures import ThreadPoolExecutor
 
 console = Console() 
@@ -94,19 +95,24 @@ def analyze_project(project_dir):
         gemini = GeminiAPI()
         return gemini.analyze_project_structure(contents)
 
-    # Start a thread for the analysis
-    with ThreadPoolExecutor() as executor:
-        future = executor.submit(analyze)
-
-        # Display a loader while processing
-        with click.progressbar(label='Analyzing project structure', length=100) as bar:
+    console = Console()
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True,
+    ) as progress:
+        task = progress.add_task("Analyzing project structure...", total=None)
+        
+        with ThreadPoolExecutor() as executor:
+            future = executor.submit(analyze)
+            
             while not future.done():
                 time.sleep(0.1)  # Sleep briefly to avoid busy-waiting
-                bar.update(1)  # Update the progress bar
-
-        # Get the result of the analysis after it is done
-        suggestions = future.result()
-
+                progress.update(task, advance=0)  # This keeps the spinner spinning
+            
+            suggestions = future.result()
+    
     # Render and print Markdown using rich
     markdown = Markdown(suggestions)
     console.print(markdown)
