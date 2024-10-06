@@ -4,7 +4,8 @@ import pyfiglet
 from colorama import init, Fore
 from cuehub.commands import django, flask, fastapi, pyramid, tornado 
 from cuehub.commands.analyze_project import GeminiAPI
-from cuehub.utils.framework_helper import save_user_details, check_existing_user,list_project_contents
+from cuehub.commands.generate_readme import GeminiAPI
+from cuehub.utils.framework_helper import save_user_details, check_existing_user,list_project_contents,read_project_files
 import time
 from rich.console import Console
 from rich.markdown import Markdown
@@ -115,6 +116,60 @@ def analyze_project(project_dir):
     
     # Render and print Markdown using rich
     markdown = Markdown(suggestions)
+    console.print(markdown)
+
+@cue.command()
+@click.argument('project_dir', type=click.Path(exists=True))
+def generate_readme(project_dir):
+    """Generate a README file for the project."""
+    console = Console()
+    
+    # Ask user if the project is open-source
+    is_opensource = click.confirm("Is this project open-source?", default=True)
+    
+    def generate():
+        project_structure = list_project_contents(project_dir)
+        
+        project_info = f"""
+        Project Structure:
+        {project_structure}
+
+        Key File Contents:
+        {read_project_files(project_dir)}
+
+        This project is {"open-source" if is_opensource else "not open-source"}.
+        """
+        
+        # Send to Gemini API
+        gemini = GeminiAPI()
+        return gemini.generate_readme(project_info)
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True,
+    ) as progress:
+        task = progress.add_task("Generating README...", total=None)
+        
+        with ThreadPoolExecutor() as executor:
+            future = executor.submit(generate)
+            
+            while not future.done():
+                time.sleep(0.1)
+                progress.update(task, advance=0)
+            
+            readme_content = future.result()
+    
+    # Write README content to file
+    readme_path = os.path.join(project_dir, 'README.md')
+    with open(readme_path, 'w') as f:
+        f.write(readme_content)
+    
+    console.print(f"[green]README.md has been generated at: {readme_path}[/green]")
+    
+    # Preview the generated README
+    markdown = Markdown(readme_content)
+    console.print("\n[bold]Generated README Preview:[/bold]\n")
     console.print(markdown)
 
 if __name__ == "__main__":
