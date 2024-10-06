@@ -88,8 +88,6 @@ def setup(framework):
 @click.argument('project_dir', type=click.Path(exists=True))
 def analyze_project(project_dir):
     """Analyze the project directory and suggest improvements."""
-    
-    click.echo("Analyzing project structure, please wait...")
     def analyze():
         """Function to perform the analysis."""
         contents = list_project_contents(project_dir)  # Assuming this function lists files and directories
